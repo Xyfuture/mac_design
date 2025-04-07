@@ -1,0 +1,18 @@
+{
+    "name": "Synopsys DevContainer",
+    "image": "dockerpull.pw/phyzli/ubuntu18.04_xfce4_vnc4server_synopsys",
+    "postCreateCommand": [
+        "mv /usr/synopsys/cx-K-2015.06/platforms/linux64/lib/libstdc++.so.6 /usr/synopsys/cx-K-2015.06/platforms/linux64/lib/libstdc++.so.6_bak",
+        "ln -s /usr/lib/x86_64-linux-gnu/libstdc++.so.6 /usr/synopsys/cx-K-2015.06/platforms/linux64/lib/libstdc++.so.6",
+        "mv /usr/synopsys/vc_static-O-2018.09-SP2-2/verdi/etc/lib/libstdc++/LINUXAMD64/libtinfo.so.5 /usr/synopsys/vc_static-O-2018.09-SP2-2/verdi/etc/lib/libstdc++/LINUXAMD64/libtinfo.so.5_bak",
+        "ln -s /lib/x86_64-linux-gnu/libtinfo.so.5 /usr/synopsys/vc_static-O-2018.09-SP2-2/verdi/etc/lib/libstdc++/LINUXAMD64/libtinfo.so.5",
+        "cp -r /lib/terminfo/* /usr/share/terminfo/ 2> /dev/null",
+        "service ssh start >> /root/startup_run.log",
+        "/usr/synopsys/11.9/amd64/bin/lmgrd -c /usr/local/flexlm/licenses/license.dat >> /root/startup_run.log",
+        "/bin/bash"
+    ],
+    "runArgs": [
+        "--hostname","lizhen",
+        "--mac-address", "02:42:ac:11:00:02"
+    ]
+}
