@@ -6,15 +6,18 @@ module input_register (
     input signed [3:0] in_a2,  // 第二个4-bit 输入
     input signed [7:0] in_b1,  // 第一个8-bit 输入
     input signed [7:0] in_b2,  // 第二个8-bit 输入
-    output reg signed [3:0] reg_a1,  // 第一个4-bit 寄存器
-    output reg signed [3:0] reg_a2,  // 第二个4-bit 寄存器
-    output reg signed [7:0] reg_b1,  // 第一个8-bit 寄存器
-    output reg signed [7:0] reg_b2,  // 第二个8-bit 寄存器
+
     output signed [3:0] out_a1, // 转发输出
     output signed [3:0] out_a2, // 转发输出
     output signed [7:0] out_b1, // 转发输出
     output signed [7:0] out_b2  // 转发输出
 );
+
+reg signed [3:0] reg_a1;  // 第一个4-bit 寄存器
+reg signed [3:0] reg_a2;  // 第二个4-bit 寄存器
+reg signed [7:0] reg_b1;  // 第一个8-bit 寄存器
+reg signed [7:0] reg_b2;  // 第二个8-bit 寄存器
+
 
 always @(posedge clk or posedge reset) begin
     if (reset) begin
@@ -82,10 +85,9 @@ module double_mac_unit (
     output signed [7:0] out_b2  // 转发输出
 );
 
-wire signed [3:0] reg_a1, reg_a2;
-wire signed [7:0] reg_b1, reg_b2;
 wire signed [11:0] product1, product2;
 wire signed [25:0] acc_out;
+wire signed [12:0] product_sum;
 
 // 实例化输入寄存器
 input_register u_input_register (
@@ -96,10 +98,6 @@ input_register u_input_register (
     .in_a2(in_a2),
     .in_b1(in_b1),
     .in_b2(in_b2),
-    .reg_a1(reg_a1),
-    .reg_a2(reg_a2),
-    .reg_b1(reg_b1),
-    .reg_b2(reg_b2),
     .out_a1(out_a1),
     .out_a2(out_a2),
     .out_b1(out_b1),
@@ -108,23 +106,26 @@ input_register u_input_register (
 
 // 实例化两个乘法器
 signed_multiplier u_multiplier1 (
-    .a(reg_a1),
-    .b(reg_b1),
+    .a(in_a1),
+    .b(in_b1),
     .product(product1)
 );
 
 signed_multiplier u_multiplier2 (
-    .a(reg_a2),
-    .b(reg_b2),
+    .a(in_a2),
+    .b(in_b2),
     .product(product2)
 );
+
+
+assign product_sum = product1 + product2;
 
 // 实例化累加器
 accumulator u_accumulator (
     .clk(clk),
     .reset(reset),
     .pulse(pulse),
-    .product_in(product1 + product2),  // 两次乘法结果相加
+    .product_in(product_sum),  // 两次乘法结果相加
     .acc_out(acc_out)
 );
 

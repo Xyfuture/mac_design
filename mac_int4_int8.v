@@ -7,11 +7,13 @@ module input_register (
     input pulse,  // 脉动信号
     input signed [3:0] in_a,  // 4-bit 输入
     input signed [7:0] in_b,  // 8-bit 输入
-    output reg signed [3:0] reg_a,  // 4-bit 寄存器
-    output reg signed [7:0] reg_b,  // 8-bit 寄存器
     output signed [3:0] out_a, // 转发输出
     output signed [7:0] out_b  // 转发输出
 );
+
+
+reg signed [3:0] reg_a;  // 4-bit 寄存器
+reg signed [7:0] reg_b;  // 8-bit 寄存器
 
 always @(posedge clk or posedge reset) begin
     if (reset) begin
@@ -77,8 +79,7 @@ module mac_unit (
     output signed [7:0] out_b  // 转发输出
 );
 
-wire signed [3:0] reg_a;
-wire signed [7:0] reg_b;
+
 wire signed [11:0] product;
 wire signed [25:0] acc_out;
 
@@ -89,16 +90,14 @@ input_register u_input_register (
     .pulse(pulse),
     .in_a(in_a),
     .in_b(in_b),
-    .reg_a(reg_a),
-    .reg_b(reg_b),
     .out_a(out_a),
     .out_b(out_b)
 );
 
 // 实例化乘法器
 signed_multiplier u_multiplier (
-    .a(reg_a),
-    .b(reg_b),
+    .a(in_a),
+    .b(in_b),
     .product(product)
 );
 
