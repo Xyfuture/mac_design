@@ -1,17 +1,17 @@
 
 module mux_3to1 (
-    input [7:0] a,  // 8-bit input a
-    input [7:0] b,  // 8-bit input b
-    input [8:0] c,  // 9-bit input c
+    input signed [7:0] a,  // 8-bit input a
+    input signed [7:0] b,  // 8-bit input b
+    input signed [8:0] c,  // 9-bit input c
     input [1:0] sel, // 2-bit select signal
-    output reg [8:0] out // output is 9-bit to accommodate the largest input (c)
+    output reg signed [8:0] out // output is 9-bit to accommodate the largest input (c)
 );
 
 always @(*) begin
     case(sel)
         // 2'b00: out = 9'b0;   // if sel is 00, output 0
-        2'b01: out = {1'b0, a};  // if sel is 01, output a (8 bits), pad 1 bit to make 9-bit
-        2'b10: out = {1'b0, b};  // if sel is 10, output b (8 bits), pad 1 bit to make 9-bit
+        2'b01: out = {b[7], b};  // if sel is 01, output a (8 bits), pad 1 bit to make 9-bit
+        2'b10: out = {a[7], a};  // if sel is 10, output b (8 bits), pad 1 bit to make 9-bit
         2'b11: out = c;    // if sel is 11, output c (9 bits)
         default: out = 9'b0; // default case, output 0
     endcase
@@ -172,8 +172,8 @@ mux_3to1 u_mux_in_4 (
     .out(part_in_4)
 );
 
-assign part_sum_1 = {part_in_1} + {part_in_2};
-assign part_sum_2 = {part_in_3} + {part_in_4};
+assign part_sum_1 = $signed(part_in_1) + $signed({part_in_2,1'b0});
+assign part_sum_2 = $signed({part_in_3,2'b00}) + $signed({part_in_4,3'b000});
 
 assign product_sum = part_sum_1 + part_sum_2;
 
